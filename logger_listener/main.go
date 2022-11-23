@@ -9,16 +9,17 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 )
 
 var BASE_URL string
 var USERNAME string
 var PASSWORD string
 
-const PROBABILITY_SYSTEM = 0.1
-const PROBABILITY_DB = 0.1
-const PROBABILITY_REPO = 0.1
-const PROBABILITY_BRANCH = 0.1
+var PROBABILITY_SYSTEM, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_SYSTEM"), 64)
+var PROBABILITY_DB, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_DB"), 64)
+var PROBABILITY_REPO, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_REPO"), 64)
+var PROBABILITY_BRANCH, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_BRANCH"), 64)
 
 type LogEntry struct {
 	Descriptor       Descriptor `json:"descriptor"`

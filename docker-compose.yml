@@ -8,6 +8,10 @@ services:
       - TERMINUSDB_BASE_HOST=http://terminusdb:6363
       - TERMINUSDB_USERNAME=admin
       - TERMINUSDB_PASSWORD=root
+      - TERMINUSDB_PROB_SYSTEM=0.1
+      - TERMINUSDB_PROB_DB=0.1
+      - TERMINUSDB_PROB_REPO=0.1
+      - TERMINUSDB_PROB_BRANCH=0.1
   fluentd:
     image: fluent/fluentd:edge
     ports:
