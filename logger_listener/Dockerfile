@@ -1,11 +1,9 @@
-FROM golang:1.16-alpine
-
+FROM golang:1.16-alpine as builder
 WORKDIR /app
-
 COPY . /app
+RUN CGO_ENABLED=0 go build -o listener main.go
 
-RUN go build -o listener main.go
-
-EXPOSE 1053
-
-CMD [ "/app/listener" ]
+FROM scratch
+WORKDIR /app
+COPY --from=builder /app/listener /app/listener
+ENTRYPOINT [ "/app/listener" ]
