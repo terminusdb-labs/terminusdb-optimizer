@@ -1,0 +1,33 @@
+version: "3.3"  # optional since v1.27.0
+services:
+  logger:
+    build: ./logger_listener
+    ports:
+      - 9090:9090
+    environment:
+      - TERMINUSDB_BASE_HOST=http://terminusdb:6363
+      - TERMINUSDB_USERNAME=admin
+      - TERMINUSDB_PASSWORD=root
+  fluentd:
+    image: fluent/fluentd:edge
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluentd:/fluentd/etc
+  terminusdb:
+    image: terminusdb/terminusdb-server:dev
+    restart: on-failure
+    environment:
+      - TERMINUSDB_LOG_LEVEL=DEBUG
+      - TERMINUSDB_LOG_FORMAT=json
+    depends_on:
+      - logger
+      - fluentd
+    ports:
+      - "6363:6363"
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: "localhost:24224"
+        tag: "terminusdb"
