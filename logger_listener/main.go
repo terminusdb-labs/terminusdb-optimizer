@@ -45,10 +45,10 @@ func sendOptimize(path string) {
 	}
 	if response.StatusCode == 200 {
 		message := fmt.Sprintf("Optimize %s completed succesfully", path)
-		fmt.Printf(`{"sevirity": "DEBUG", "message": "%s", "path": "%s"}` + "\n", message, path)
+		fmt.Printf(`{"sevirity": "DEBUG", "message": "%s", "path": "%s"}`+"\n", message, path)
 	} else {
 		message := fmt.Sprintf("Optimize %s failed", path)
-		fmt.Printf(`{"sevirity": "ERROR", "message": "%s", "path": "%s"}` + "\n", message, path)
+		fmt.Printf(`{"sevirity": "ERROR", "message": "%s", "path": "%s"}`+"\n", message, path)
 	}
 }
 
@@ -91,7 +91,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	// TODO: This should be filtered by fluentd already
+	// This should be filtered by fluentd already
 	if logEntry.DescriptorAction != "commit" {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -99,14 +99,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	if logEntry.Descriptor.DescriptorType == "system" {
 		optimizeSystem()
+	} else if logEntry.Descriptor.Branch != "" {
+		optimizeBranch(&logEntry.Descriptor)
 	} else if logEntry.Descriptor.Database != "" {
 		optimizeDatabase(&logEntry.Descriptor)
 	} else if logEntry.Descriptor.Repository != "" {
 		optimizeRepo(&logEntry.Descriptor)
-	} else if logEntry.Descriptor.Branch != "" {
-		optimizeBranch(&logEntry.Descriptor)
+		w.WriteHeader(http.StatusOK)
 	}
-	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
