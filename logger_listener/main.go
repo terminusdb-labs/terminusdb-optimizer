@@ -45,10 +45,10 @@ func sendOptimize(path string) {
 	}
 	if response.StatusCode == 200 {
 		message := fmt.Sprintf("Optimize %s completed succesfully", path)
-		fmt.Printf(`{"sevirity": "DEBUG", "message": "%s", "path": "%s"}`+"\n", message, path)
+		fmt.Printf(`{"severity": "DEBUG", "message": "%s", "path": "%s"}`+"\n", message, path)
 	} else {
 		message := fmt.Sprintf("Optimize %s failed", path)
-		fmt.Printf(`{"sevirity": "ERROR", "message": "%s", "path": "%s"}`+"\n", message, path)
+		fmt.Printf(`{"severity": "ERROR", "message": "%s", "path": "%s"}`+"\n", message, path)
 	}
 }
 
