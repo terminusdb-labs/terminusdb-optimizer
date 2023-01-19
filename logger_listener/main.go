@@ -99,14 +99,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	if logEntry.Descriptor.DescriptorType == "system" {
 		optimizeSystem()
-	} else if logEntry.Descriptor.Branch != "" {
-		optimizeBranch(&logEntry.Descriptor)
-	} else if logEntry.Descriptor.Database != "" {
-		optimizeDatabase(&logEntry.Descriptor)
-	} else if logEntry.Descriptor.Repository != "" {
-		optimizeRepo(&logEntry.Descriptor)
-		w.WriteHeader(http.StatusOK)
 	}
+	if logEntry.Descriptor.Branch != "" {
+		optimizeBranch(&logEntry.Descriptor)
+	}
+	if logEntry.Descriptor.Database != "" {
+		optimizeDatabase(&logEntry.Descriptor)
+	}
+	if logEntry.Descriptor.Repository != "" {
+		optimizeRepo(&logEntry.Descriptor)
+	}
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
