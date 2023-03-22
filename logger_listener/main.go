@@ -99,6 +99,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, fluentEntry := range fluentBitEntries {
+		fmt.Println("IN FLUENTBIT ENTRY ITERATING")
 		// This should be filtered by fluentd already
 		if fluentEntry.LogEntry.DescriptorAction != "commit" {
 			w.WriteHeader(http.StatusOK)
