@@ -21,6 +21,10 @@ var PROBABILITY_DB, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_DB"), 64)
 var PROBABILITY_REPO, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_REPO"), 64)
 var PROBABILITY_BRANCH, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_BRANCH"), 64)
 
+type FluentBitEntry struct {
+	LogEntry LogEntry `json:"log_processed"`
+}
+
 type LogEntry struct {
 	Descriptor       Descriptor `json:"descriptor"`
 	DescriptorAction string     `json:"descriptorAction"`
@@ -81,35 +85,33 @@ func optimizeDatabase(descriptor *Descriptor) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	raw_message, _ := ioutil.ReadAll(r.Body)
-	fmt.Printf("RAW MESSAGE\n")
-	fmt.Printf("%s\n", raw_message)
 	if !json.Valid(raw_message) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	var logEntry *LogEntry
-	err := json.Unmarshal(raw_message, &logEntry)
+	var fluentBitEntry *FluentBitEntry
+	err := json.Unmarshal(raw_message, &fluentBitEntry)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 	// This should be filtered by fluentd already
-	if logEntry.DescriptorAction != "commit" {
+	if fluentBitEntry.LogEntry.DescriptorAction != "commit" {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	if logEntry.Descriptor.DescriptorType == "system" {
+	if fluentBitEntry.LogEntry.Descriptor.DescriptorType == "system" {
 		optimizeSystem()
 	}
-	if logEntry.Descriptor.Branch != "" {
-		optimizeBranch(&logEntry.Descriptor)
+	if fluentBitEntry.LogEntry.Descriptor.Branch != "" {
+		optimizeBranch(&fluentBitEntry.LogEntry.Descriptor)
 	}
-	if logEntry.Descriptor.Database != "" {
-		optimizeDatabase(&logEntry.Descriptor)
+	if fluentBitEntry.LogEntry.Descriptor.Database != "" {
+		optimizeDatabase(&fluentBitEntry.LogEntry.Descriptor)
 	}
-	if logEntry.Descriptor.Repository != "" {
-		optimizeRepo(&logEntry.Descriptor)
+	if fluentBitEntry.LogEntry.Descriptor.Repository != "" {
+		optimizeRepo(&fluentBitEntry.LogEntry.Descriptor)
 	}
 	w.WriteHeader(http.StatusOK)
 }
