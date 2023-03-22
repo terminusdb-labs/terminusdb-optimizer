@@ -22,7 +22,7 @@ var PROBABILITY_REPO, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_REPO"), 
 var PROBABILITY_BRANCH, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_BRANCH"), 64)
 
 type FluentBitEntry struct {
-	LogEntry LogEntry `json:"log_processed"`
+	LogEntries []LogEntry `json:"log_processed"`
 }
 
 type LogEntry struct {
@@ -95,23 +95,26 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	// This should be filtered by fluentd already
-	if fluentBitEntry.LogEntry.DescriptorAction != "commit" {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	for _, logEntry := range fluentBitEntry.LogEntries {
+		// element is the element from someSlice for where we are
+		// This should be filtered by fluentd already
+		if logEntry.DescriptorAction != "commit" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
 
-	if fluentBitEntry.LogEntry.Descriptor.DescriptorType == "system" {
-		optimizeSystem()
-	}
-	if fluentBitEntry.LogEntry.Descriptor.Branch != "" {
-		optimizeBranch(&fluentBitEntry.LogEntry.Descriptor)
-	}
-	if fluentBitEntry.LogEntry.Descriptor.Database != "" {
-		optimizeDatabase(&fluentBitEntry.LogEntry.Descriptor)
-	}
-	if fluentBitEntry.LogEntry.Descriptor.Repository != "" {
-		optimizeRepo(&fluentBitEntry.LogEntry.Descriptor)
+		if logEntry.Descriptor.DescriptorType == "system" {
+			optimizeSystem()
+		}
+		if logEntry.Descriptor.Branch != "" {
+			optimizeBranch(&logEntry.Descriptor)
+		}
+		if logEntry.Descriptor.Database != "" {
+			optimizeDatabase(&logEntry.Descriptor)
+		}
+		if logEntry.Descriptor.Repository != "" {
+			optimizeRepo(&logEntry.Descriptor)
+		}
 	}
 	w.WriteHeader(http.StatusOK)
 }
