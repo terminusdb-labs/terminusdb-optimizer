@@ -85,6 +85,7 @@ func optimizeDatabase(descriptor *Descriptor) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	raw_message, _ := ioutil.ReadAll(r.Body)
+	fmt.Println(raw_message)
 	if !json.Valid(raw_message) {
 		fmt.Printf("CAN'T PARSE JSON")
 		w.WriteHeader(http.StatusOK)
