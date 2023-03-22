@@ -81,6 +81,8 @@ func optimizeDatabase(descriptor *Descriptor) {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	raw_message, _ := ioutil.ReadAll(r.Body)
+	fmt.Printf("RAW MESSAGE\n")
+	fmt.Printf("%s\n", raw_message)
 	if !json.Valid(raw_message) {
 		w.WriteHeader(http.StatusOK)
 		return
