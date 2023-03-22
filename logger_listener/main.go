@@ -22,7 +22,7 @@ var PROBABILITY_REPO, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_REPO"), 
 var PROBABILITY_BRANCH, _ = strconv.ParseFloat(os.Getenv("TERMINUSDB_PROB_BRANCH"), 64)
 
 type FluentBitEntry struct {
-	LogEntries []LogEntry `json:"log_processed"`
+	LogEntry LogEntry `json:"log_processed"`
 }
 
 type LogEntry struct {
@@ -90,32 +90,31 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	var fluentBitEntry *FluentBitEntry
-	err := json.Unmarshal(raw_message, &fluentBitEntry)
+	fluentBitEntries := make([]FluentBitEntry, 0)
+	err := json.Unmarshal(raw_message, &fluentBitEntries)
 	if err != nil {
 		fmt.Printf("CAN'T UNMARSHAL JSON")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	for _, logEntry := range fluentBitEntry.LogEntries {
-		// element is the element from someSlice for where we are
+	for _, fluentEntry := range fluentBitEntries {
 		// This should be filtered by fluentd already
-		if logEntry.DescriptorAction != "commit" {
+		if fluentEntry.LogEntry.DescriptorAction != "commit" {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
 
-		if logEntry.Descriptor.DescriptorType == "system" {
+		if fluentEntry.LogEntry.Descriptor.DescriptorType == "system" {
 			optimizeSystem()
 		}
-		if logEntry.Descriptor.Branch != "" {
-			optimizeBranch(&logEntry.Descriptor)
+		if fluentEntry.LogEntry.Descriptor.Branch != "" {
+			optimizeBranch(&fluentEntry.LogEntry.Descriptor)
 		}
-		if logEntry.Descriptor.Database != "" {
-			optimizeDatabase(&logEntry.Descriptor)
+		if fluentEntry.LogEntry.Descriptor.Database != "" {
+			optimizeDatabase(&fluentEntry.LogEntry.Descriptor)
 		}
-		if logEntry.Descriptor.Repository != "" {
-			optimizeRepo(&logEntry.Descriptor)
+		if fluentEntry.LogEntry.Descriptor.Repository != "" {
+			optimizeRepo(&fluentEntry.LogEntry.Descriptor)
 		}
 	}
 	w.WriteHeader(http.StatusOK)
