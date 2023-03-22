@@ -97,12 +97,10 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	fmt.Printf("%+v\n", fluentBitEntries)
 	for _, fluentEntry := range fluentBitEntries {
 		// This should be filtered by fluentd already
 		if fluentEntry.LogEntry.DescriptorAction != "commit" {
-			w.WriteHeader(http.StatusOK)
-			return
+			continue
 		}
 
 		if fluentEntry.LogEntry.Descriptor.DescriptorType == "system" {
