@@ -91,7 +91,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	fluentBitEntries := make([]FluentBitEntry, 0)
+	var fluentBitEntries []FluentBitEntry
 	err := json.Unmarshal(raw_message, &fluentBitEntries)
 	if err != nil {
 		fmt.Printf("CAN'T UNMARSHAL JSON")
